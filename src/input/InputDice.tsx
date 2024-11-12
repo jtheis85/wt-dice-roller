@@ -23,9 +23,11 @@ const iconsBySides = {
   4: d4,
 };
 
-interface Props {}
+interface Props {
+  onRoll: (diceNotation: string) => void;
+}
 
-const InputDice: React.FC<Props> = ({}) => {
+const InputDice: React.FC<Props> = ({ onRoll }) => {
   const [isShowMenu, setIsShowMenu] = useState(false);
   const [manualDiceInput, setManualDiceInput] = useState("");
   const [diceCounts, setDiceCounts] = useState({
@@ -52,6 +54,8 @@ const InputDice: React.FC<Props> = ({}) => {
       return input.concat([`${count}d${sides}`]);
     }, [] as string[])
     .join("+");
+
+  const currentInputValue = manualDiceInput || autoDiceInput;
 
   return (
     <div className="input-dice">
@@ -93,7 +97,11 @@ const InputDice: React.FC<Props> = ({}) => {
               </button>
             );
           })}
-          <button disabled={!isRollEnabled} className="button-roll standard">
+          <button
+            onClick={() => onRoll(currentInputValue)}
+            disabled={!isRollEnabled}
+            className="button-roll standard"
+          >
             Roll
           </button>
         </div>
@@ -106,8 +114,13 @@ const InputDice: React.FC<Props> = ({}) => {
       </button>
       <input
         placeholder="/r 2d20kh1+1d4+5"
-        value={manualDiceInput || autoDiceInput}
+        value={currentInputValue}
         onChange={(e) => setManualDiceInput(e.currentTarget.value)}
+        onKeyUp={(e) => {
+          if (e.key === "Enter" || e.keyCode === 13) {
+            onRoll(currentInputValue);
+          }
+        }}
       />
     </div>
   );
