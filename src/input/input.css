@@ -1,0 +1,19 @@
+:root {
+  --color-background-input: #40ddb324;
+}
+
+.input-dice {
+  width: 480px;
+  height: 48px;
+  border-radius: 24px;
+  border: none;
+  background-color: var(--color-background-input);
+  padding: 4px 48px;
+  font-family: "Lato", sans-serif;
+  font-size: 16px;
+  color: var(--color-text-primary);
+
+  &::placeholder {
+    color: var(--color-text-placeholder);
+  }
+}

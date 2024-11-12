@@ -7,6 +7,29 @@
   --color-disabled: #89938e;
   --color-text-primary:  #fbfcff;
   --color-text-secondary:  #bfc9c3;
+  --color-text-placeholder: #89938E;
 
   background-color: var(--color-background-primary);
+  font-family: "Lato", sans-serif;
+}
+
+* {
+  /* Otherwise widths will not take padding into account. Set for whole app. */
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  /* Stretch the app to the full viewport height */
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* This is the REACT root, not the page root above */
+#root {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
 }
