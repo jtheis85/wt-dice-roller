@@ -48,6 +48,7 @@ const InputDice: React.FC<Props> = ({}) => {
             const quantity = diceCounts[sides];
             return (
               <button
+                key={sides}
                 className={`button-dice minimal ${
                   quantity < 1 ? "inactive" : ""
                 }`}
