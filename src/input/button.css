@@ -1,8 +1,21 @@
 .minimal {
+  color: var(--color-text-primary);
   background-color: transparent;
   border: none;
 
   &:hover {
     background-color: hsla(0,0%,100%, 0.1);
   }
+}
+
+.standard {
+  height: 40px;
+
+  font-weight: bold;
+  font-size: 14px;
+  text-transform: uppercase;
+
+  border: 1px solid #89938E;
+  background-color: transparent;
+  color: var(--color-accent);
 }

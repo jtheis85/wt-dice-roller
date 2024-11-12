@@ -10,6 +10,7 @@
   --color-text-placeholder: #89938E;
 
   background-color: var(--color-background-primary);
+  color: var(--color-text-primary);
   font-family: "Lato", sans-serif;
 }
 
@@ -36,6 +37,9 @@ body {
 
 button {
   cursor: pointer;
+  border-radius: 4px;
+
+  font-family: "Lato", sans-serif;
 
   /* Animate button hover transitions */
   transition: background-color 0.3s;
