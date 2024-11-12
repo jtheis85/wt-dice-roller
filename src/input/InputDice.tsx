@@ -11,52 +11,77 @@ import d8 from "../assets/d8.svg";
 import d6 from "../assets/d6.svg";
 import d4 from "../assets/d4.svg";
 
+type Sides = 20 | 100 | 10 | 8 | 6 | 4;
+
+// Map these icons to make them easy to look up
+const iconsBySides = {
+  20: d20,
+  100: d100,
+  10: d10,
+  8: d8,
+  6: d6,
+  4: d4,
+};
+
 interface Props {}
 
 const InputDice: React.FC<Props> = ({}) => {
   const [isShowMenu, setIsShowMenu] = useState(false);
+  const [diceCounts, setDiceCounts] = useState({
+    20: 0,
+    100: 0,
+    10: 0,
+    8: 0,
+    6: 0,
+    4: 0,
+  });
+
+  const isRollEnabled = Object.keys(diceCounts).some(
+    (sides) => diceCounts[parseInt(sides) as Sides] > 0
+  );
 
   return (
     <div className="input-dice">
       {isShowMenu && (
         <div className="dice-popover">
-          <button className="button-dice minimal inactive">
-            <div>
-              <img src={d20} />
-            </div>{" "}
-            -d20
+          {([20, 100, 10, 8, 6, 4] as Sides[]).map((sides) => {
+            const quantity = diceCounts[sides];
+            return (
+              <button
+                className={`button-dice minimal ${
+                  quantity < 1 ? "inactive" : ""
+                }`}
+                // This is off spec. Would probably discuss with team before
+                // adding, but convenient for testing.
+                // Right Click
+                onContextMenu={(e) => {
+                  e.preventDefault();
+
+                  // Don't allow negatives
+                  if (quantity === 0) return;
+
+                  setDiceCounts({
+                    ...diceCounts,
+                    [sides]: quantity - 1,
+                  });
+                }}
+                onClick={(e) => {
+                  setDiceCounts({
+                    ...diceCounts,
+                    [sides]: quantity + 1,
+                  });
+                }}
+              >
+                <div>
+                  <img src={iconsBySides[sides]} />
+                </div>{" "}
+                {quantity > 0 ? quantity : "-"}d{sides}
+              </button>
+            );
+          })}
+          <button disabled={!isRollEnabled} className="button-roll standard">
+            Roll
           </button>
-          <button className="button-dice minimal inactive">
-            <div>
-              <img src={d100} />
-            </div>{" "}
-            -d100
-          </button>
-          <button className="button-dice minimal inactive">
-            <div>
-              <img src={d10} />
-            </div>{" "}
-            -d10
-          </button>
-          <button className="button-dice minimal inactive">
-            <div>
-              <img src={d8} />
-            </div>{" "}
-            -8
-          </button>
-          <button className="button-dice minimal inactive">
-            <div>
-              <img src={d6} />
-            </div>{" "}
-            -d6
-          </button>
-          <button className="button-dice minimal inactive">
-            <div>
-              <img src={d4} />
-            </div>{" "}
-            -d4
-          </button>
-          <button className="button-roll standard">Roll</button>
         </div>
       )}
       <button

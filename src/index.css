@@ -43,4 +43,9 @@ button {
 
   /* Animate button hover transitions */
   transition: background-color 0.3s;
+
+  &:disabled {
+    opacity: 0.5;
+    filter: grayscale(1);
+  }
 }
