@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import logo from "./assets/logo.webp";
 import InputDice from "./input/InputDice";
+import { io } from "socket.io-client";
 
 function App() {
   const [accessToken, setAccessToken] = useState("");
@@ -20,7 +21,10 @@ function App() {
     if (!accessToken) {
       getToken();
     }
-  }, [accessToken]);
+    const socket = io("http://3.92.126.7:5000");
+    socket.connect();
+    socket.on("diceRoll", (msg) => console.log(msg));
+  }, []);
 
   const onRoll = async (diceNotation: string) => {
     const res = await fetch(
