@@ -27,6 +27,7 @@ interface Props {}
 
 const InputDice: React.FC<Props> = ({}) => {
   const [isShowMenu, setIsShowMenu] = useState(false);
+  const [manualDiceInput, setManualDiceInput] = useState("");
   const [diceCounts, setDiceCounts] = useState({
     20: 0,
     100: 0,
@@ -39,6 +40,18 @@ const InputDice: React.FC<Props> = ({}) => {
   const isRollEnabled = Object.keys(diceCounts).some(
     (sides) => diceCounts[parseInt(sides) as Sides] > 0
   );
+
+  // Build an automatic dice notation input from the user's selections
+  const autoDiceInput = Object.keys(diceCounts)
+    .reverse()
+    .reduce((input, sides) => {
+      const count = diceCounts[parseInt(sides) as Sides];
+      // Filter out any 0's
+      if (count === 0) return input;
+
+      return input.concat([`${count}d${sides}`]);
+    }, [] as string[])
+    .join("+");
 
   return (
     <div className="input-dice">
@@ -66,7 +79,7 @@ const InputDice: React.FC<Props> = ({}) => {
                     [sides]: quantity - 1,
                   });
                 }}
-                onClick={(e) => {
+                onClick={() => {
                   setDiceCounts({
                     ...diceCounts,
                     [sides]: quantity + 1,
@@ -91,7 +104,11 @@ const InputDice: React.FC<Props> = ({}) => {
       >
         <img src={addDice} />
       </button>
-      <input placeholder="/r 2d20kh1+1d4+5" />
+      <input
+        placeholder="/r 2d20kh1+1d4+5"
+        value={manualDiceInput || autoDiceInput}
+        onChange={(e) => setManualDiceInput(e.currentTarget.value)}
+      />
     </div>
   );
 };
