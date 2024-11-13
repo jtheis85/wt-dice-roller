@@ -1,0 +1,41 @@
+.chat-message {
+  &.sender-self {
+    align-self: flex-end;
+
+    .chat-bubble {
+      background-color: var(--color-background-input);
+    }
+  }
+  &.sender-other {
+    align-self: flex-start;
+  }
+}
+
+.chat-bubble {
+  padding: 12px 16px;
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .timestamp,
+  .dice-notation,
+  .breakdown
+  .sum {
+    display: block;
+    font-size: 16px;
+  }
+
+  .dice-notation {
+    color: var(--color-text-secondary);
+  }
+
+}
+
+.timestamp {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  display: block;
+  text-align: right;
+  padding: 0 8px 4px 0;
+}

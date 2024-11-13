@@ -1,12 +1,42 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import logo from "./assets/logo.webp";
 import InputDice from "./input/InputDice";
 import { io } from "socket.io-client";
+import ChatBubble from "./chat/ChatBubble";
+
+export type ChatMessage = {
+  notation: string;
+  sum: number;
+  results: [
+    | {
+        type: "dice";
+        count: number;
+        sides: number;
+        allRolls: [number];
+        keptRolls: [number];
+        total: number;
+      }
+    | {
+        type: "constant";
+        result: number;
+      }
+  ];
+  timestamp: string;
+};
 
 function App() {
   const [accessToken, setAccessToken] = useState("");
-  const [rollResults, setRollResults] = useState({});
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+
+  const chatMessagesRef: React.MutableRefObject<ChatMessage[]> = useRef<
+    ChatMessage[]
+  >([]);
+  const updateChatMessages = (msg: ChatMessage) => {
+    const newChatMessages = [...chatMessagesRef.current, msg];
+    chatMessagesRef.current = newChatMessages;
+    setChatMessages(newChatMessages);
+  };
 
   useEffect(() => {
     const getToken = async () => {
@@ -23,20 +53,16 @@ function App() {
     }
     const socket = io("http://3.92.126.7:5000");
     socket.connect();
-    socket.on("diceRoll", (msg) => console.log(msg));
+    socket.on("diceRoll", (msg) => updateChatMessages(msg));
   }, []);
 
   const onRoll = async (diceNotation: string) => {
-    const res = await fetch(
+    fetch(
       `http://3.92.126.7:5000/api/dice-rolls/${diceNotation}/?accessToken=${accessToken}&verbose=true`,
       {
         method: "GET",
       }
     );
-
-    const json = await res.json();
-
-    setRollResults(json);
   };
 
   return (
@@ -46,7 +72,15 @@ function App() {
       </header>
       <div className="app-body">
         <div className="chat-window">
-          {JSON.stringify(rollResults)}
+          <div className="chat-messages">
+            {chatMessages.map((chatMessage, i) => (
+              <ChatBubble
+                key={`${i}-${chatMessage.timestamp}`}
+                {...{ chatMessage }}
+                isSenderSelf
+              />
+            ))}
+          </div>
           <InputDice {...{ accessToken, onRoll }} />
         </div>
       </div>
