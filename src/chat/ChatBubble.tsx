@@ -1,6 +1,6 @@
 import React from "react";
 import "./chat.css";
-import { ChatMessage } from "../App";
+import { ChatMessage } from "../api/api";
 
 interface Props {
   chatMessage: ChatMessage;

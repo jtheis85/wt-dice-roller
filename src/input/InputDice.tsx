@@ -57,55 +57,56 @@ const InputDice: React.FC<Props> = ({ onRoll }) => {
 
   const currentInputValue = manualDiceInput || autoDiceInput;
 
+  // TODO: Probably pull this out into it's own component
+  const diceMenu = (
+    <div className="dice-popover">
+      {([20, 100, 10, 8, 6, 4] as Sides[]).map((sides) => {
+        const quantity = diceCounts[sides];
+        return (
+          <button
+            key={sides}
+            className={`button-dice minimal ${quantity < 1 ? "inactive" : ""}`}
+            // This is off spec. Would probably discuss with team before
+            // adding, but convenient for testing.
+            // Right Click
+            onContextMenu={(e) => {
+              e.preventDefault();
+
+              // Don't allow negatives
+              if (quantity === 0) return;
+
+              setDiceCounts({
+                ...diceCounts,
+                [sides]: quantity - 1,
+              });
+            }}
+            onClick={() => {
+              setDiceCounts({
+                ...diceCounts,
+                [sides]: quantity + 1,
+              });
+            }}
+          >
+            <div>
+              <img src={iconsBySides[sides]} />
+            </div>{" "}
+            {quantity > 0 ? quantity : "-"}d{sides}
+          </button>
+        );
+      })}
+      <button
+        onClick={() => onRoll(currentInputValue)}
+        disabled={!isRollEnabled}
+        className="button-roll standard"
+      >
+        Roll
+      </button>
+    </div>
+  );
+
   return (
     <div className="input-dice">
-      {isShowMenu && (
-        <div className="dice-popover">
-          {([20, 100, 10, 8, 6, 4] as Sides[]).map((sides) => {
-            const quantity = diceCounts[sides];
-            return (
-              <button
-                key={sides}
-                className={`button-dice minimal ${
-                  quantity < 1 ? "inactive" : ""
-                }`}
-                // This is off spec. Would probably discuss with team before
-                // adding, but convenient for testing.
-                // Right Click
-                onContextMenu={(e) => {
-                  e.preventDefault();
-
-                  // Don't allow negatives
-                  if (quantity === 0) return;
-
-                  setDiceCounts({
-                    ...diceCounts,
-                    [sides]: quantity - 1,
-                  });
-                }}
-                onClick={() => {
-                  setDiceCounts({
-                    ...diceCounts,
-                    [sides]: quantity + 1,
-                  });
-                }}
-              >
-                <div>
-                  <img src={iconsBySides[sides]} />
-                </div>{" "}
-                {quantity > 0 ? quantity : "-"}d{sides}
-              </button>
-            );
-          })}
-          <button
-            onClick={() => onRoll(currentInputValue)}
-            disabled={!isRollEnabled}
-            className="button-roll standard"
-          >
-            Roll
-          </button>
-        </div>
-      )}
+      {isShowMenu && diceMenu}
       <button
         onClick={() => setIsShowMenu(!isShowMenu)}
         className="button-add-dice minimal"

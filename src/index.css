@@ -2,14 +2,15 @@
 
 :root {
   --color-accent: #41deb4;
-  --color-background-primary: #032834;
-  --color-background-secondary: #07333c;
+  --color-background: #032834;
   --color-disabled: #89938e;
   --color-text-primary:  #fbfcff;
   --color-text-secondary:  #bfc9c3;
   --color-text-placeholder: #89938E;
+  --color-button-hover: hsla(0,0%,100%, 0.1);
+  --color-button-border: #89938E;
 
-  background-color: var(--color-background-primary);
+  background-color: var(--color-background);
   color: var(--color-text-primary);
   font-family: "Lato", sans-serif;
 }

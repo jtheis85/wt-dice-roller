@@ -2,28 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import logo from "./assets/logo.webp";
 import InputDice from "./input/InputDice";
-import { io } from "socket.io-client";
-import ChatBubble from "./chat/ChatBubble";
 
-export type ChatMessage = {
-  notation: string;
-  sum: number;
-  results: [
-    | {
-        type: "dice";
-        count: number;
-        sides: number;
-        allRolls: [number];
-        keptRolls: [number];
-        total: number;
-      }
-    | {
-        type: "constant";
-        result: number;
-      }
-  ];
-  timestamp: string;
-};
+import ChatBubble from "./chat/ChatBubble";
+import { ChatMessage, fetchToken, listenToSocketIo, sendRoll } from "./api/api";
 
 function App() {
   const [accessToken, setAccessToken] = useState("");
@@ -32,38 +13,27 @@ function App() {
   const chatMessagesRef: React.MutableRefObject<ChatMessage[]> = useRef<
     ChatMessage[]
   >([]);
+  // Unfortunate dance to keep a ref in sync with the state, so we can update
+  // the state in response to socket.io messages. With just setting the state
+  // directly, the chatMessages state variable was being captured in the
+  // useEffect closure, resulting in a single chat message being added to an
+  // "always empty" array. Look into better ways to do this.
   const updateChatMessages = (msg: ChatMessage) => {
     const newChatMessages = [...chatMessagesRef.current, msg];
     chatMessagesRef.current = newChatMessages;
     setChatMessages(newChatMessages);
   };
 
+  // Initialize the app with the API, getting a token and connecting to the
+  // socket.io stream
   useEffect(() => {
     const getToken = async () => {
-      const res = await fetch("http://3.92.126.7:5000/api/access-token", {
-        method: "POST",
-      });
-
-      const json = await res.json();
-
-      setAccessToken(json.accessToken);
+      const token = await fetchToken();
+      setAccessToken(token);
+      listenToSocketIo((msg) => updateChatMessages(msg));
     };
-    if (!accessToken) {
-      getToken();
-    }
-    const socket = io("http://3.92.126.7:5000");
-    socket.connect();
-    socket.on("diceRoll", (msg) => updateChatMessages(msg));
+    getToken();
   }, []);
-
-  const onRoll = async (diceNotation: string) => {
-    fetch(
-      `http://3.92.126.7:5000/api/dice-rolls/${diceNotation}/?accessToken=${accessToken}&verbose=true`,
-      {
-        method: "GET",
-      }
-    );
-  };
 
   return (
     <div className="app">
@@ -81,7 +51,10 @@ function App() {
               />
             ))}
           </div>
-          <InputDice {...{ accessToken, onRoll }} />
+          <InputDice
+            {...{ accessToken }}
+            onRoll={(diceNotation) => sendRoll(diceNotation, accessToken)}
+          />
         </div>
       </div>
     </div>
